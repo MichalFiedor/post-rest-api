@@ -1,21 +1,20 @@
-package com.fiedormichal.postrestapi.model;
+package com.fiedormichal.postrestapi.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
 
 @Getter
 @Setter
-@Entity
-public class Post {
+@Builder
+public class PostDto {
     @Id
     @Column(nullable = false)
     private long id;
-    private long userId;
     @Column(nullable = false)
     private String title;
     private String body;
-    private boolean isUpdated=false;
-    private boolean isDeleted=false;
 }
