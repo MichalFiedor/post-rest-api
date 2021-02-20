@@ -1,5 +1,6 @@
-package com.fiedormichal.postrestapi.dto;
+package com.fiedormichal.postrestapi.mapper;
 
+import com.fiedormichal.postrestapi.dto.PostDto;
 import com.fiedormichal.postrestapi.model.Post;
 
 import java.util.List;
