@@ -1,7 +1,8 @@
 package com.fiedormichal.postrestapi.service;
 
+import com.fiedormichal.exception.PostNotFoundException;
 import com.fiedormichal.postrestapi.dto.PostDto;
-import com.fiedormichal.postrestapi.dto.PostDtoMapper;
+import com.fiedormichal.postrestapi.mapper.PostDtoMapper;
 import com.fiedormichal.postrestapi.mapper.JsonPostMapper;
 import com.fiedormichal.postrestapi.model.Post;
 import com.fiedormichal.postrestapi.repository.PostRepository;
@@ -17,18 +18,18 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final JsonPostMapper jsonPostMapper;
+    private static final String API_URL = "https://jsonplaceholder.typicode.com/posts";
 
     @Scheduled(cron = "0 0 12 * * ?")
     public void updatePostsInDataBase() {
-        String apiUrl = "https://jsonplaceholder.typicode.com/posts";
         List<Post> actualPostsFromAPI = null;
         try {
-            actualPostsFromAPI = jsonPostMapper.getMappedPostsList(apiUrl);
+            actualPostsFromAPI = jsonPostMapper.getMappedPostsList(API_URL);
         } catch (IOException e) {
             e.printStackTrace();
         }
         saveActualPostsWhenDataBaseIsEmpty(actualPostsFromAPI);
-        updatePostsInDataBase(actualPostsFromAPI);
+        updateCurrentPostsInDataBase(actualPostsFromAPI);
     }
 
     private void saveActualPostsWhenDataBaseIsEmpty(List<Post> posts) {
@@ -41,7 +42,7 @@ public class PostService {
         posts.stream().forEach(post -> postRepository.save(post));
     }
 
-    private void updatePostsInDataBase(List<Post> actualPostsFromAPI) {
+    private void updateCurrentPostsInDataBase(List<Post> actualPostsFromAPI) {
         List<Post> postsFromDataBase = postRepository.findAll();
         for (Post postFromDataBase : postsFromDataBase) {
             if (!postFromDataBase.isUpdated()) {
@@ -62,15 +63,15 @@ public class PostService {
         return new Post();
     }
 
-    public PostDto edit(Post post) {
+    public PostDto edit(Post post) throws PostNotFoundException {
         prepareEditedPostToSave(post);
         postRepository.save(post);
         return PostDtoMapper.mapToPostDto(post);
     }
 
-    private Post prepareEditedPostToSave(Post post) {
+    private Post prepareEditedPostToSave(Post post) throws PostNotFoundException {
         Post postFromDataBase = postRepository.findById(post.getId())
-                .orElseThrow(() -> new RuntimeException("Post does not exist."));
+                .orElseThrow(() -> new PostNotFoundException("Post does not exist"));
         post.setUpdated(true);
         post.setUserId(postFromDataBase.getUserId());
         return post;
@@ -80,8 +81,10 @@ public class PostService {
         return PostDtoMapper.mapToPostDtos(postRepository.findAll());
     }
 
-    public void delete(long postId) {
-        postRepository.deleteById(postId);
+    public void delete(long postId) throws PostNotFoundException {
+        Post postToDelete = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post does not exist"));
+        postRepository.delete(postToDelete);
     }
 
     public List<PostDto> getByUserId(long userId) {
