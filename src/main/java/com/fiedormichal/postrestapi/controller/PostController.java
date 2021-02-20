@@ -31,8 +31,8 @@ public class PostController {
 
     @PostMapping("/posts/REST")
     @ResponseStatus(value = HttpStatus.OK)
-    public void updateAndShowAllPosts(){
-        postService.updatedPosts();
+    public void updatePosts(){
+        postService.updatePostsInDataBase();
     }
 
     @PutMapping("/posts")

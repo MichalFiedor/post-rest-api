@@ -6,7 +6,7 @@ import com.fiedormichal.postrestapi.mapper.JsonPostMapper;
 import com.fiedormichal.postrestapi.model.Post;
 import com.fiedormichal.postrestapi.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -18,55 +18,79 @@ public class PostService {
     private final PostRepository postRepository;
     private final JsonPostMapper jsonPostMapper;
 
-    public void updatedPosts() {
+    @Scheduled(cron = "0 0 12 * * ?")
+    public void updatePostsInDataBase() {
         String apiUrl = "https://jsonplaceholder.typicode.com/posts";
-        List<Post> posts = null;
+        List<Post> actualPostsFromAPI = null;
         try {
-            posts = jsonPostMapper.getMappedPostsList(apiUrl);
+            actualPostsFromAPI = jsonPostMapper.getMappedPostsList(apiUrl);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        saveAll(posts);
+        saveActualPostsWhenDataBaseIsEmpty(actualPostsFromAPI);
+        updatePostsInDataBase(actualPostsFromAPI);
     }
 
-    public void saveAll(List<Post> posts){
-        posts.stream().forEach(post -> postRepository.save(post));
-    }
-
-    public Post save(Post post){
-        return postRepository.save(post);
-    }
-
-    public PostDto edit(Post post) throws Exception {
-        if(exist(post)){
-            post.setUpdated(true);
-            postRepository.save(post);
-            return PostDtoMapper.mapToPostDto(post);
-        } else {
-            throw new Exception("Post does not exist.");
+    private void saveActualPostsWhenDataBaseIsEmpty(List<Post> posts) {
+        if (postRepository.count() == 0) {
+            saveAll(posts);
         }
     }
 
-    public List<PostDto> findAll(){
+    private void saveAll(List<Post> posts) {
+        posts.stream().forEach(post -> postRepository.save(post));
+    }
+
+    private void updatePostsInDataBase(List<Post> actualPostsFromAPI) {
+        List<Post> postsFromDataBase = postRepository.findAll();
+        for (Post postFromDataBase : postsFromDataBase) {
+            if (!postFromDataBase.isUpdated()) {
+                Post actualPostToSaveInDataBase = findActualPost(postFromDataBase, actualPostsFromAPI);
+                if (actualPostToSaveInDataBase.getId() != 0) {
+                    postRepository.save(actualPostToSaveInDataBase);
+                }
+            }
+        }
+    }
+
+    private Post findActualPost(Post post, List<Post> actualPostsFromAPI) {
+        for (Post actualPostFromAPI : actualPostsFromAPI) {
+            if (actualPostFromAPI.getId() == post.getId()) {
+                return actualPostFromAPI;
+            }
+        }
+        return new Post();
+    }
+
+    public PostDto edit(Post post) {
+        prepareEditedPostToSave(post);
+        postRepository.save(post);
+        return PostDtoMapper.mapToPostDto(post);
+    }
+
+    private Post prepareEditedPostToSave(Post post) {
+        Post postFromDataBase = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("Post does not exist."));
+        post.setUpdated(true);
+        post.setUserId(postFromDataBase.getUserId());
+        return post;
+    }
+
+    public List<PostDto> findAll() {
         return PostDtoMapper.mapToPostDtos(postRepository.findAll());
     }
 
-    public void delete(long postId) throws Exception {
-        Post post = postRepository.findById(postId).orElseThrow(()->new Exception("Post not found"));
-        post.setDeleted(true);
-        postRepository.save(post);
+    public void delete(long postId) {
+        postRepository.deleteById(postId);
     }
 
-    public List<PostDto> getByUserId(long userId){
+    public List<PostDto> getByUserId(long userId) {
         List<Post> userPosts = postRepository.findAllByUserId(userId);
         return PostDtoMapper.mapToPostDtos(userPosts);
     }
 
-    public PostDto getByTitle(String title){
+    public PostDto getByTitle(String title) {
         return PostDtoMapper.mapToPostDto(postRepository.findByTitle(title));
     }
 
-    public boolean exist(Post post){
-        return postRepository.existsById(post.getId());
-    }
 }

@@ -17,5 +17,4 @@ public class Post {
     private String title;
     private String body;
     private boolean isUpdated=false;
-    private boolean isDeleted=false;
 }
