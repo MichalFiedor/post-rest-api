@@ -12,6 +12,7 @@
 	<artifactId>post-rest-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>post-rest-api</name>
+	<packaging>jar</packaging>
 	<description>An application to manage posts that come from a public API.</description>
 	<properties>
 		<java.version>11</java.version>
@@ -87,5 +88,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
