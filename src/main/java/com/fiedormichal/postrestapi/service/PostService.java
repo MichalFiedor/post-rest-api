@@ -3,7 +3,6 @@ package com.fiedormichal.postrestapi.service;
 import com.fiedormichal.postrestapi.exception.NoContentException;
 import com.fiedormichal.postrestapi.exception.PostNotFoundException;
 import com.fiedormichal.postrestapi.dto.PostDto;
-import com.fiedormichal.postrestapi.exception.UserNotFoundException;
 import com.fiedormichal.postrestapi.mapper.PostDtoMapper;
 import com.fiedormichal.postrestapi.mapper.JsonPostMapper;
 import com.fiedormichal.postrestapi.model.Post;
@@ -43,7 +42,7 @@ public class PostService {
     private void updateCurrentPostsInDataBase(List<Post> actualPostsFromAPI) {
         List<Post> postsFromDataBase = postRepository.findAll();
         for (Post postFromDataBase : postsFromDataBase) {
-            if (!postFromDataBase.isUpdated()) {
+            if (!postFromDataBase.isUpdatedByUser()) {
                 Post actualPostToSaveInDataBase = findActualPost(postFromDataBase, actualPostsFromAPI);
                 if (actualPostToSaveInDataBase.getId() != 0) {
                     postRepository.save(actualPostToSaveInDataBase);
@@ -61,7 +60,7 @@ public class PostService {
         return new Post();
     }
 
-    public PostDto edit(Post post) throws PostNotFoundException {
+    public PostDto editPost(Post post) throws PostNotFoundException {
         prepareEditedPostToSave(post);
         postRepository.save(post);
         return PostDtoMapper.mapToPostDto(post);
@@ -69,8 +68,8 @@ public class PostService {
 
     private Post prepareEditedPostToSave(Post post) throws PostNotFoundException {
         Post postFromDataBase = postRepository.findById(post.getId())
-                .orElseThrow(() -> new PostNotFoundException("Post with ID: " + post.getId() + " does not exist"));
-        post.setUpdated(true);
+                .orElseThrow(() -> new PostNotFoundException("Post with ID: " + post.getId() + " does not exist."));
+        post.setUpdatedByUser(true);
         post.setUserId(postFromDataBase.getUserId());
         if(post.getTitle()==null){
             post.setTitle(postFromDataBase.getTitle());
@@ -81,31 +80,23 @@ public class PostService {
         return post;
     }
 
-    public List<PostDto> findAll() {
+    public List<PostDto> findAllPosts() {
         List<Post> posts = postRepository.findAll();
         if(posts.size()==0){
-            throw new NoContentException("Posts database is empty");
+            throw new NoContentException("Posts database is empty.");
         }
-        return PostDtoMapper.mapToPostDtos(postRepository.findAll());
+        return PostDtoMapper.mapToPostDtos(posts);
     }
 
-    public void delete(long postId) {
+    public void deletePost(long postId) {
         Post postToDelete = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Post with ID: " + postId + " does not exist"));
+                .orElseThrow(() -> new PostNotFoundException("Post with ID: " + postId + " does not exist."));
         postRepository.delete(postToDelete);
     }
 
-    public List<PostDto> getByUserId(long userId) {
-        List<Post> userPosts = postRepository.findAllByUserId(userId);
-        if(userPosts.size()==0){
-            throw new UserNotFoundException("User with ID: " + userId + " does not exist");
-        }
-        return PostDtoMapper.mapToPostDtos(userPosts);
-    }
-
-    public PostDto getByTitle(String title) {
+    public PostDto getPostByTitle(String title) {
         Post post = postRepository.findByTitle(title).orElseThrow(()->
-                new PostNotFoundException("Post with title: " + title + " does not exist"));
+                new PostNotFoundException("Post with title: " + title + " does not exist."));
         return PostDtoMapper.mapToPostDto(post);
     }
 

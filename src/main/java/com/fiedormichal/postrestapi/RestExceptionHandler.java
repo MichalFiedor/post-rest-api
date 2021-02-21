@@ -4,7 +4,6 @@ import com.fiedormichal.postrestapi.apierror.ApiError;
 import com.fiedormichal.postrestapi.apierror.ApiErrorMsg;
 import com.fiedormichal.postrestapi.exception.NoContentException;
 import com.fiedormichal.postrestapi.exception.PostNotFoundException;
-import com.fiedormichal.postrestapi.exception.UserNotFoundException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -113,14 +112,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         errors.add(ex.getMessage());
 
         return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, ApiErrorMsg.API_CONNECTION_FAILURE.toString()));
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    protected ResponseEntity<Object> handlePostNotFound(UserNotFoundException ex){
-        List<String> errors = new ArrayList<>();
-        errors.add(ex.getMessage());
-
-        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, ApiErrorMsg.USER_NOT_FOUND.toString()));
     }
 
     @ExceptionHandler(NoContentException.class)
