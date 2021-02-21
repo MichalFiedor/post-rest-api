@@ -44,9 +44,7 @@ public class PostService {
         for (Post postFromDataBase : postsFromDataBase) {
             if (!postFromDataBase.isUpdatedByUser()) {
                 Post actualPostToSaveInDataBase = findActualPost(postFromDataBase, actualPostsFromAPI);
-                if (actualPostToSaveInDataBase.getId() != 0) {
                     postRepository.save(actualPostToSaveInDataBase);
-                }
             }
         }
     }
