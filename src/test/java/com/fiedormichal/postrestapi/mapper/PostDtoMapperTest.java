@@ -16,9 +16,9 @@ class PostDtoMapperTest {
     @Test
     void should_return_postDto_object(){
         //given
-        Post post = new Post(2,1, "title", "body");
+        final Post post = new Post(2,1, "title", "body");
         //when
-        PostDto result = PostDtoMapper.mapToPostDto(post);
+        final PostDto result = PostDtoMapper.mapToPostDto(post);
         //then
         assertEquals(PostDto.class, result.getClass());
         assertEquals(2, result.getId());
@@ -31,11 +31,11 @@ class PostDtoMapperTest {
         //given
         final Post post1 = new Post(2,1, "title1", "body1");
         final Post post2 = new Post(3,2, "title2", "body2");
-        final  List<Post> posts = new ArrayList<>();
+        final List<Post> posts = new ArrayList<>();
         posts.add(post1);
         posts.add(post2);
         //when
-        List<PostDto> result = PostDtoMapper.mapToPostDtos(posts);
+        final List<PostDto> result = PostDtoMapper.mapToPostDtos(posts);
         //then
         assertEquals(2, result.size());
         assertEquals("title2", result.get(1).getTitle());
