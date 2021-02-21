@@ -1,8 +1,7 @@
 package com.fiedormichal.postrestapi.exception;
 
 import com.fiedormichal.postrestapi.apierror.ApiError;
-import com.fiedormichal.postrestapi.exception.NoContentException;
-import com.fiedormichal.postrestapi.exception.PostNotFoundException;
+import com.fiedormichal.postrestapi.apierror.ApiErrorMsg;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,13 +14,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.fiedormichal.postrestapi.apierror.ApiErrorMsg.*;
 
 @RestControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -34,8 +33,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> errors = new ArrayList<>();
         errors.add(ex.getMessage());
 
-        return buildResponseEntity(getApiError(errors, HttpStatus.BAD_REQUEST, "Mismatch Type."));
+        return buildResponseEntity(getApiError(errors, HttpStatus.BAD_REQUEST, MISMATCH_TYPE.getValue()));
     }
+
+
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
@@ -49,7 +50,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .map(error->error.getObjectName() + " : " + error.getDefaultMessage())
                 .collect(Collectors.toList());
 
-        return buildResponseEntity(getApiError(errors, HttpStatus.BAD_REQUEST, "Validation Errors."));
+        return buildResponseEntity(getApiError(errors, HttpStatus.BAD_REQUEST, VALIDATION_ERRORS.getValue()));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   WebRequest request) {
             List<String> errors = new ArrayList<>();
             errors.add(ex.getMessage());
-        return buildResponseEntity(getApiError(errors, HttpStatus.BAD_REQUEST, "Malformed JSON Request."));
+        return buildResponseEntity(getApiError(errors, HttpStatus.BAD_REQUEST, MALFORMED_JSON_REQUEST.getValue()));
     }
 
     @Override
@@ -75,7 +76,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ex.getSupportedMediaTypes().forEach(type->builder.append(type).append(", "));
         errors.add(builder.toString());
 
-        return buildResponseEntity(getApiError(errors, HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type."));
+        return buildResponseEntity(getApiError(errors, HttpStatus.UNSUPPORTED_MEDIA_TYPE, UNSUPPORTED_MEDIA_TYPE.getValue()));
     }
 
     @Override
@@ -87,7 +88,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         errors.add(String.format("Could not find the %s method for URL %s",
                 ex.getHttpMethod(), ex.getRequestURL()));
 
-        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, "Method Not Found."));
+        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, METHOD_NOT_FOUND.getValue()));
     }
 
     @ExceptionHandler(PostNotFoundException.class)
@@ -95,12 +96,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> errors = new ArrayList<>();
         errors.add(ex.getMessage());
 
-        ApiError apiError = new ApiError(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND,
-                "Post Not Found.",
-                errors);
-        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, "Post Not Found."));
+        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, POST_NOT_FOUND.getValue()));
+    }
+
+    @ExceptionHandler(PostTitleNotFoundException.class)
+    protected ResponseEntity<Object> handleTitleNotFound(PostTitleNotFoundException ex){
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, POST_WITH_GIVEN_TITLE_NOT_FOUND.getValue()));
     }
 
     @ExceptionHandler(IOException.class)
@@ -108,7 +111,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> errors = new ArrayList<>();
         errors.add(ex.getMessage());
 
-        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, "API Connection Failure."));
+        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, API_CONNECTION_FAILURE.getValue()));
     }
 
     @ExceptionHandler(NoContentException.class)
@@ -116,15 +119,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> errors = new ArrayList<>();
         errors.add(ex.getMessage());
 
-        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, "Post Not Found."));
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    protected ResponseEntity<?> handleConstraintViolation(ConstraintViolationException ex){
-        List<String> errors = new ArrayList<>();
-        errors.add(ex.getMessage());
-
-        return buildResponseEntity(getApiError(errors, HttpStatus.BAD_REQUEST, "Constraint Violations."));
+        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, POSTS_NOT_FOUND.getValue()));
     }
 
     @ExceptionHandler(Exception.class)
@@ -132,7 +127,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> errors = new ArrayList<>();
         errors.add(ex.getLocalizedMessage());
 
-        return buildResponseEntity(getApiError(errors, HttpStatus.BAD_REQUEST, "Error Occurred."));
+        return buildResponseEntity(getApiError(errors, HttpStatus.BAD_REQUEST, ERROR_OCCURRED.getValue()));
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError){
