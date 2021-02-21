@@ -1,7 +1,9 @@
 package com.fiedormichal.postrestapi.service;
 
-import com.fiedormichal.exception.PostNotFoundException;
+import com.fiedormichal.postrestapi.exception.PostNotFoundException;
 import com.fiedormichal.postrestapi.dto.PostDto;
+import com.fiedormichal.postrestapi.exception.PostsUpdateFailedException;
+import com.fiedormichal.postrestapi.exception.UserNotFoundException;
 import com.fiedormichal.postrestapi.mapper.PostDtoMapper;
 import com.fiedormichal.postrestapi.mapper.JsonPostMapper;
 import com.fiedormichal.postrestapi.model.Post;
@@ -27,6 +29,9 @@ public class PostService {
             actualPostsFromAPI = jsonPostMapper.getMappedPostsList(API_URL);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        if(actualPostsFromAPI.size()==0 || actualPostsFromAPI==null){
+            throw new PostsUpdateFailedException("Posts have not been updated.");
         }
         saveActualPostsWhenDataBaseIsEmpty(actualPostsFromAPI);
         updateCurrentPostsInDataBase(actualPostsFromAPI);
@@ -71,9 +76,15 @@ public class PostService {
 
     private Post prepareEditedPostToSave(Post post) throws PostNotFoundException {
         Post postFromDataBase = postRepository.findById(post.getId())
-                .orElseThrow(() -> new PostNotFoundException("Post does not exist"));
+                .orElseThrow(() -> new PostNotFoundException("Post with ID: " + post.getId() + " does not exist"));
         post.setUpdated(true);
         post.setUserId(postFromDataBase.getUserId());
+        if(post.getTitle()==null){
+            post.setTitle(postFromDataBase.getTitle());
+        }
+        if(post.getBody()==null){
+            post.setBody(postFromDataBase.getBody());
+        }
         return post;
     }
 
@@ -81,19 +92,24 @@ public class PostService {
         return PostDtoMapper.mapToPostDtos(postRepository.findAll());
     }
 
-    public void delete(long postId) throws PostNotFoundException {
+    public void delete(long postId) {
         Post postToDelete = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Post does not exist"));
+                .orElseThrow(() -> new PostNotFoundException("Post with ID: " + postId + " does not exist"));
         postRepository.delete(postToDelete);
     }
 
     public List<PostDto> getByUserId(long userId) {
         List<Post> userPosts = postRepository.findAllByUserId(userId);
+        if(userPosts.size()==0){
+            throw new UserNotFoundException("User with ID: " + userId + " does not exist");
+        }
         return PostDtoMapper.mapToPostDtos(userPosts);
     }
 
     public PostDto getByTitle(String title) {
-        return PostDtoMapper.mapToPostDto(postRepository.findByTitle(title));
+        Post post = postRepository.findByTitle(title).orElseThrow(()->
+                new PostNotFoundException("Post with title: " + title + " does not exist"));
+        return PostDtoMapper.mapToPostDto(post);
     }
 
 }
