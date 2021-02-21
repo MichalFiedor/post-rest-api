@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -19,7 +20,8 @@ public class PostController {
 
     @GetMapping("/posts")
     public ResponseEntity<Object> getAllPosts(){
-        return showListOrSendNoContentStatus();
+        List<PostDto> posts= postService.findAll();
+        return ResponseEntity.ok().body(posts);
     }
 
     @GetMapping("/posts/{userId}")
@@ -34,7 +36,7 @@ public class PostController {
     }
 
     @PostMapping("/posts/REST")
-    public ResponseEntity<String> updatePosts(){
+    public ResponseEntity<String> updatePosts() throws IOException {
         postService.updatePostsInDataBase();
         return ResponseEntity.ok().body("Post successfully updated");
     }
@@ -51,11 +53,11 @@ public class PostController {
         return ResponseEntity.ok().body("Post successfully deleted");
     }
 
-    private ResponseEntity<Object> showListOrSendNoContentStatus(){
-        List<PostDto> posts= postService.findAll();
-        if(posts.size()==0){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("List is empty.");
-        }
-        return ResponseEntity.ok().body(posts);
-    }
+//    private ResponseEntity<Object> showListOrSendNoContentStatus(){
+//        List<PostDto> posts= postService.findAll();
+//        if(posts.size()==0){
+//            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("List is empty.");
+//        }
+//        return ResponseEntity.ok().body(posts);
+//    }
 }
