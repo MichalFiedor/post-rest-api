@@ -1,8 +1,8 @@
 package com.fiedormichal.postrestapi.service;
 
+import com.fiedormichal.postrestapi.exception.NoContentException;
 import com.fiedormichal.postrestapi.exception.PostNotFoundException;
 import com.fiedormichal.postrestapi.dto.PostDto;
-import com.fiedormichal.postrestapi.exception.PostsUpdateFailedException;
 import com.fiedormichal.postrestapi.exception.UserNotFoundException;
 import com.fiedormichal.postrestapi.mapper.PostDtoMapper;
 import com.fiedormichal.postrestapi.mapper.JsonPostMapper;
@@ -23,16 +23,9 @@ public class PostService {
     private static final String API_URL = "https://jsonplaceholder.typicode.com/posts";
 
     @Scheduled(cron = "0 0 12 * * ?")
-    public void updatePostsInDataBase() {
-        List<Post> actualPostsFromAPI = null;
-        try {
-            actualPostsFromAPI = jsonPostMapper.getMappedPostsList(API_URL);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if(actualPostsFromAPI.size()==0 || actualPostsFromAPI==null){
-            throw new PostsUpdateFailedException("Posts have not been updated.");
-        }
+    public void updatePostsInDataBase() throws IOException {
+        List<Post> actualPostsFromAPI =
+                jsonPostMapper.getMappedPostsList(API_URL);
         saveActualPostsWhenDataBaseIsEmpty(actualPostsFromAPI);
         updateCurrentPostsInDataBase(actualPostsFromAPI);
     }
@@ -89,6 +82,10 @@ public class PostService {
     }
 
     public List<PostDto> findAll() {
+        List<Post> posts = postRepository.findAll();
+        if(posts.size()==0){
+            throw new NoContentException("Posts database is empty");
+        }
         return PostDtoMapper.mapToPostDtos(postRepository.findAll());
     }
 
