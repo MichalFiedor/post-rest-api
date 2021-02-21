@@ -52,12 +52,4 @@ public class PostController {
         postService.delete(postId);
         return ResponseEntity.ok().body("Post successfully deleted");
     }
-
-//    private ResponseEntity<Object> showListOrSendNoContentStatus(){
-//        List<PostDto> posts= postService.findAll();
-//        if(posts.size()==0){
-//            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("List is empty.");
-//        }
-//        return ResponseEntity.ok().body(posts);
-//    }
 }
