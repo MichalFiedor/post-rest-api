@@ -4,12 +4,10 @@ import com.fiedormichal.postrestapi.dto.PostDto;
 import com.fiedormichal.postrestapi.model.Post;
 import com.fiedormichal.postrestapi.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.io.IOException;
 import java.util.List;
 
@@ -20,18 +18,13 @@ public class PostController {
 
     @GetMapping("/posts")
     public ResponseEntity<Object> getAllPosts(){
-        List<PostDto> posts= postService.findAll();
+        List<PostDto> posts= postService.findAllPosts();
         return ResponseEntity.ok().body(posts);
-    }
-
-    @GetMapping("/posts/{userId}")
-    public ResponseEntity<List<PostDto>>getPostsByUserId(@PathVariable long userId){
-        return ResponseEntity.ok().body(postService.getByUserId(userId));
     }
 
     @GetMapping("/post/{title}")
     public ResponseEntity<PostDto> getPostByTitle(@PathVariable String title){
-        PostDto post = postService.getByTitle(title);
+        PostDto post = postService.getPostByTitle(title);
         return ResponseEntity.ok().body(post);
     }
 
@@ -43,13 +36,13 @@ public class PostController {
 
     @PutMapping("/posts")
     public ResponseEntity<PostDto> editPost(@Valid @RequestBody Post post){
-        PostDto editedPost = postService.edit(post);
+        PostDto editedPost = postService.editPost(post);
         return ResponseEntity.ok().body(editedPost);
     }
 
     @DeleteMapping("posts/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable long postId){
-        postService.delete(postId);
+        postService.deletePost(postId);
         return ResponseEntity.ok().body("Post successfully deleted");
     }
 }

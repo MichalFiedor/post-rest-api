@@ -1,5 +1,6 @@
 package com.fiedormichal.postrestapi.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,5 +26,22 @@ public class Post {
     private String title;
     @Size(min = 5, max = 500, message = "Body must contain from 5 to 3000 characters.")
     private String body;
-    private boolean isUpdated = false;
+    private boolean isUpdatedByUser = false;
+
+    public Post(){
+
+    }
+
+    public Post(long id, String title, String body){
+        this.id=id;
+        this.title=title;
+        this.body=body;
+    }
+
+    public Post(long id, long userId, String title, String body){
+        this.id=id;
+        this.userId=userId;
+        this.title=title;
+        this.body=body;
+    }
 }
