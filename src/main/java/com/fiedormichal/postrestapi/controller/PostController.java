@@ -22,7 +22,7 @@ public class PostController {
         return ResponseEntity.ok().body(posts);
     }
 
-    @GetMapping("/post/{title}")
+    @GetMapping("/posts/{title}")
     public ResponseEntity<PostDto> getPostByTitle(@PathVariable String title){
         PostDto post = postService.getPostByTitle(title);
         return ResponseEntity.ok().body(post);
