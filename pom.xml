@@ -75,6 +75,7 @@
 			<version>6.0.17.Final</version>
 		</dependency>
 		<dependency>
+
 			<groupId>com.github.fge</groupId>
 			<artifactId>json-schema-core</artifactId>
 			<version>1.2.5</version>
