@@ -3,6 +3,7 @@ package com.fiedormichal.postrestapi.service;
 import com.fiedormichal.postrestapi.exception.NoContentException;
 import com.fiedormichal.postrestapi.exception.PostNotFoundException;
 import com.fiedormichal.postrestapi.dto.PostDto;
+import com.fiedormichal.postrestapi.exception.PostTitleNotFoundException;
 import com.fiedormichal.postrestapi.mapper.PostDtoMapper;
 import com.fiedormichal.postrestapi.mapper.JsonPostMapper;
 import com.fiedormichal.postrestapi.model.Post;
@@ -94,7 +95,7 @@ public class PostService {
 
     public PostDto getPostByTitle(String title) {
         Post post = postRepository.findByTitle(title).orElseThrow(()->
-                new PostNotFoundException("Post with title: " + title + " does not exist."));
+                new PostTitleNotFoundException("Post with title: " + title + " does not exist."));
         return PostDtoMapper.mapToPostDto(post);
     }
 
