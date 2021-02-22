@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private static final Logger LOG = LogManager.getLogger();
 
     @GetMapping("/posts")
     public ResponseEntity<Object> getAllPosts(){

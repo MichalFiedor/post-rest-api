@@ -21,7 +21,6 @@ public class Post {
     @Positive(message = "Id must be positive digit.")
     private long id;
     private long userId;
-    @Column(nullable = false)
     @Size(min = 5, max = 500, message = "Title must contain from 5 to 500 characters.")
     private String title;
     @Size(min = 5, max = 500, message = "Body must contain from 5 to 3000 characters.")

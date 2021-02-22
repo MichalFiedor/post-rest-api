@@ -65,10 +65,9 @@ public class PostService {
 
     public PostDto editPost(Post post) throws PostNotFoundException {
         prepareEditedPostToSave(post);
-        LOG.info("Edited post has prepared for saving");
         LOG.info("Post with id: " + post.getId() + " has prepared for saving successfully.");
         postRepository.save(post);
-        LOG.info("Edited with id: " + post.getId() + " has saved successfully.");
+        LOG.info("Edited post with id: " + post.getId() + " has saved successfully.");
         return PostDtoMapper.mapToPostDto(post);
     }
 
