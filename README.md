@@ -1,9 +1,9 @@
 # Rest API Post Application
-The Post Application once a day, or at the user's request download posts data 
+The Post Application once a day, or at the user's request `http://localhost:8080/posts/REST` download posts data 
 from public API  `https://jsonplaceholder.typicode.com/posts`.
 The retrieved data is stored in the local `MySql` database. In case the database is empty, the posts 
 are saved. When the database contains data, posts are updated, ignoring posts edited by user
-or deleted posts.
+or deleted posts. 
 
 Before running the application, create a local database named `post_api` and in `application.properites`
 infill `spring.datasource.username` and `spring.datasource.password`.
@@ -90,8 +90,19 @@ infill `spring.datasource.username` and `spring.datasource.password`.
     
 ### Data Params
 
+   **Model:**
+   
+    {
+    id	integer($int64)
+    title	string
+            minLength: 5
+            maxLength: 500
+    body	string
+            minLength: 5
+            maxLength: 500    
+    }
+
    **Required:**
- 
    `{
       "id": integer,
       "body": "string",
@@ -101,7 +112,8 @@ infill `spring.datasource.username` and `spring.datasource.password`.
 ### Success Response
 
   * **Code:** 200 <br />
-    **Content:** `{
+    **Content:** 
+                 `{
                     "id": 1,
                     "title": "Post title",
                     "body": "Post body"
