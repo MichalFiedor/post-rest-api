@@ -39,7 +39,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(getApiError(errors, HttpStatus.BAD_REQUEST, MISMATCH_TYPE.getValue()));
     }
 
-
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers,
@@ -111,7 +110,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handlePostNotFound(IOException ex) {
         List<String> errors = new ArrayList<>();
         errors.add(ex.getMessage());
-        LOG.info(API_CONNECTION_FAILURE.getValue());
+        LOG.error(API_CONNECTION_FAILURE.getValue());
         return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, API_CONNECTION_FAILURE.getValue()));
     }
 
