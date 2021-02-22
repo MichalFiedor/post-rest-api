@@ -81,7 +81,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-
 			<groupId>com.github.fge</groupId>
 			<artifactId>json-schema-core</artifactId>
 			<version>1.2.5</version>
@@ -111,6 +110,17 @@
 			<artifactId>junit</artifactId>
 			<version>4.13.1</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ulisesbocchio</groupId>
+			<artifactId>jasypt-spring-boot-starter</artifactId>
+			<version>3.0.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
