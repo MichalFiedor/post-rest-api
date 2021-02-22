@@ -3,38 +3,22 @@ package com.fiedormichal.postrestapi.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiedormichal.postrestapi.dto.PostDto;
 import com.fiedormichal.postrestapi.exception.NoContentException;
-import com.fiedormichal.postrestapi.exception.PostNotFoundException;
-import com.fiedormichal.postrestapi.mapper.PostDtoMapper;
+import com.fiedormichal.postrestapi.exception.PostTitleNotFoundException;
 import com.fiedormichal.postrestapi.model.Post;
 import com.fiedormichal.postrestapi.repository.PostRepository;
 import com.fiedormichal.postrestapi.service.PostService;
 import net.minidev.json.JSONObject;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -56,13 +40,16 @@ class PostControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     @Test
     void get_post_by_title_should_return_single_post() throws Exception {
         String title = "Test title";
-        final Post post = new Post(1, 2, title, "Body for test");
+        final PostDto postDto = PostDto.builder()
+                .id(1)
+                .title(title)
+                .body("Body for test")
+                .build();
 
-        when(postRepository.findByTitle(title)).thenReturn(Optional.of(post));
+        when(postService.getPostByTitle(title)).thenReturn(postDto);
 
         mockMvc.perform(get("/posts/Test title"))
                 .andDo(print())
@@ -76,10 +63,9 @@ class PostControllerTest {
 
     @Test
     void get_post_by_title_should_respond_not_found_status_when_title_not_found() throws Exception {
-        String title = "Test title";
-        final Post post = new Post(1, 2, title, "Body for test");
+        String title = "Test";
 
-        when(postRepository.findByTitle(title)).thenReturn(Optional.of(post));
+        when(postService.getPostByTitle(title)).thenThrow(PostTitleNotFoundException.class);
 
         mockMvc.perform(get("/posts/Test"))
                 .andDo(print())

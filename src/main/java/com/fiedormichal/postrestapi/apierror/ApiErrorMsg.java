@@ -15,7 +15,7 @@ public enum ApiErrorMsg {
     METHOD_NOT_FOUND("Method with this URL not found."),
     POST_NOT_FOUND("Post not found. Check errors list for details."),
     API_CONNECTION_FAILURE("Posts not updated. API connection failure."),
-    POSTS_NOT_FOUND("Posts not found. Database is empty."),
+    POSTS_NOT_FOUND("Posts not found."),
     POST_WITH_GIVEN_TITLE_NOT_FOUND("Post not found. Check errors list for details."),
     ERROR_OCCURRED("Some exceptions occurred. Check errors list.");
 

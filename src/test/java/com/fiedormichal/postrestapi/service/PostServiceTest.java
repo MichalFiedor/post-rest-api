@@ -3,6 +3,7 @@ package com.fiedormichal.postrestapi.service;
 import com.fiedormichal.postrestapi.dto.PostDto;
 import com.fiedormichal.postrestapi.exception.NoContentException;
 import com.fiedormichal.postrestapi.exception.PostNotFoundException;
+import com.fiedormichal.postrestapi.exception.PostTitleNotFoundException;
 import com.fiedormichal.postrestapi.mapper.JsonPostMapper;
 import com.fiedormichal.postrestapi.model.Post;
 import com.fiedormichal.postrestapi.repository.PostRepository;
@@ -35,7 +36,7 @@ class PostServiceTest {
     private PostRepository postRepository;
 
     @Test
-    void find_by_title_should_return_post(){
+    void find_post_by_title_should_return_post(){
         //given
         final String title = "Test title";
         final Post post = new Post(1, 2, title, "Body for test");
@@ -60,7 +61,7 @@ class PostServiceTest {
         final String expectedMessage = "Post with title: Test title does not exist.";
         when(postRepository.findByTitle(title)).thenReturn(Optional.empty());
         //when;
-        Exception exception = assertThrows(PostNotFoundException.class, ()->postService.getPostByTitle(title));
+        Exception exception = assertThrows(PostTitleNotFoundException.class, ()->postService.getPostByTitle(title));
         //then
         assertTrue(exception.getMessage().contains(expectedMessage));
     }
