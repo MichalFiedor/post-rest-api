@@ -31,7 +31,7 @@ public class PostController {
     @PostMapping("/posts/REST")
     public ResponseEntity<String> updatePosts() throws IOException {
         postService.updatePostsInDataBase();
-        return ResponseEntity.ok().body("Post successfully updated");
+        return ResponseEntity.ok().body("Posts successfully updated");
     }
 
     @PutMapping("/posts")

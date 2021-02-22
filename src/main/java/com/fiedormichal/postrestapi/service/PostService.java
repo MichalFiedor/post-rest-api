@@ -26,13 +26,10 @@ public class PostService {
     public void updatePostsInDataBase() throws IOException {
         List<Post> actualPostsFromAPI =
                 jsonPostMapper.getMappedPostsList(API_URL);
-        saveActualPostsWhenDataBaseIsEmpty(actualPostsFromAPI);
-        updateCurrentPostsInDataBase(actualPostsFromAPI);
-    }
-
-    private void saveActualPostsWhenDataBaseIsEmpty(List<Post> posts) {
-        if (postRepository.count() == 0) {
-            saveAll(posts);
+        if(postRepository.count()==0){
+            saveAll(actualPostsFromAPI);
+        }else {
+            updateCurrentPostsInDataBase(actualPostsFromAPI);
         }
     }
 
