@@ -6,7 +6,8 @@ import com.fiedormichal.postrestapi.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
+    private static final Logger LOG = LogManager.getLogger();
 
     @GetMapping("/posts")
     public ResponseEntity<Object> getAllPosts(){

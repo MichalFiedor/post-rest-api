@@ -1,7 +1,7 @@
 # Rest API Post Application
 The Post Application once a day, or at the user's request download posts data 
 from public API  `https://jsonplaceholder.typicode.com/posts`.
-The retrieved data is stored in the local database. In case the database is empty, the posts 
+The retrieved data is stored in the local `MySql` database. In case the database is empty, the posts 
 are saved. When the database contains data, posts are updated, ignoring posts edited by user
 or deleted posts.
 
