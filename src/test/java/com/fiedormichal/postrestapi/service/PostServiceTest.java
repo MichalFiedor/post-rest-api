@@ -1,7 +1,6 @@
 package com.fiedormichal.postrestapi.service;
 
 import com.fiedormichal.postrestapi.dto.PostDto;
-import com.fiedormichal.postrestapi.exception.NoContentException;
 import com.fiedormichal.postrestapi.exception.PostNotFoundException;
 import com.fiedormichal.postrestapi.exception.PostTitleNotFoundException;
 import com.fiedormichal.postrestapi.mapper.JsonPostMapper;
@@ -90,17 +89,6 @@ class PostServiceTest {
         assertEquals(PostDto.class, result.get(0).getClass());
     }
 
-    @Test
-    void find_all_should_throw_no_content_exception(){
-        //given
-        final List<Post> posts = new ArrayList<>();
-        when(postRepository.findAll()).thenReturn(posts);
-        final String expectedMessage = "Posts database is empty.";
-        //when
-        final Exception exception = assertThrows(NoContentException.class, ()->postService.findAllPosts());
-        //then
-        assertEquals(expectedMessage, exception.getMessage());
-    }
 
     @Test
     void edit_post_should_save_updated_post_with_set_correct_userId_and_isUpdated(){

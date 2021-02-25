@@ -6,8 +6,6 @@ import com.fiedormichal.postrestapi.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -23,8 +21,8 @@ public class PostController {
         return ResponseEntity.ok().body(posts);
     }
 
-    @GetMapping("/posts/{title}")
-    public ResponseEntity<PostDto> getPostByTitle(@PathVariable String title){
+    @GetMapping("/posts/")
+    public ResponseEntity<PostDto> getPostByTitle(@RequestParam String title){
         PostDto post = postService.getPostByTitle(title);
         return ResponseEntity.ok().body(post);
     }

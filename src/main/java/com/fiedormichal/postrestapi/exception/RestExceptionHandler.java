@@ -114,14 +114,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, API_CONNECTION_FAILURE.getValue()));
     }
 
-    @ExceptionHandler(NoContentException.class)
-    protected ResponseEntity<Object> handlePostNotFound(NoContentException ex) {
-        List<String> errors = new ArrayList<>();
-        errors.add(ex.getMessage());
-        LOG.info(POSTS_NOT_FOUND.getValue());
-        return buildResponseEntity(getApiError(errors, HttpStatus.NOT_FOUND, POSTS_NOT_FOUND.getValue()));
-    }
-
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<?> handleAll(Exception ex) {
         List<String> errors = new ArrayList<>();
