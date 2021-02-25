@@ -31,32 +31,21 @@ infill `spring.datasource.username` and `spring.datasource.password`.
                       "body": "est rerum tempore vitae\  aperiam"
                     }]`
     
-### Error Response
-    
-      * **Code:** 404 NOT FOUND <br />
-        **Content:**  {
-                          "timestamp": "22-02-2021 05:47:40",
-                          "status": "NOT_FOUND",
-                          "message": "Posts not found.",
-                          "errors": [
-                              "Posts database is empty."
-                          ]
-                      }
-
-
 ## Get Post by Title
 
 ### Request
 
-`GET /posts/:title`
+`GET /posts/`
 
-    curl -X GET "http://localhost:8080/posts/magnam%20ut%20rerum%iure" -H "accept: */*"
+    curl -X GET "http://localhost:8080/posts/?title=magnam ut rerum iure" -H "accept: */*"
     
-### URL Params
+### Request Params
 
    **Required:**
  
-   `title=[String]`
+   `{
+        "title": "magnam ut rerum iure"
+    }`
   
 ### Success Response
 
@@ -78,7 +67,6 @@ infill `spring.datasource.username` and `spring.datasource.password`.
                               "Post with title: magnam ut rerum iure does not exist."
                           ]
                       }
-
 
 ## Edit Post
 
