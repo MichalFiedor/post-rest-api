@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -26,6 +27,7 @@ public class Post {
     @Size(min = 5, max = 500, message = "Body must contain from 5 to 3000 characters.")
     private String body;
     private boolean isUpdatedByUser = false;
+    private boolean isDeleted = false;
 
     public Post(){
 

@@ -2,7 +2,6 @@ package com.fiedormichal.postrestapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiedormichal.postrestapi.dto.PostDto;
-import com.fiedormichal.postrestapi.exception.NoContentException;
 import com.fiedormichal.postrestapi.exception.PostTitleNotFoundException;
 import com.fiedormichal.postrestapi.model.Post;
 import com.fiedormichal.postrestapi.repository.PostRepository;
@@ -113,28 +112,6 @@ class PostControllerTest {
                 .andExpect(jsonPath("$[1].id", is(2)))
                 .andExpect(jsonPath("$[1].title", is("Test title2")))
                 .andExpect(jsonPath("$[1].body", is("Body for test2")));
-    }
-
-    @Test
-    void get_all_posts_should_respond_not_found_status_when_database_is_empty() throws Exception {
-        when(postService.findAllPosts()).thenThrow(NoContentException.class);
-
-        mockMvc.perform(get("/posts/"))
-                .andDo(print())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(status().isNotFound());
-
-    }
-
-    @Test
-    void get_all_posts_should_respond_not_found_status_when_method_not_found() throws Exception {
-        when(postService.findAllPosts()).thenThrow(NoContentException.class);
-
-        mockMvc.perform(get("/post/"))
-                .andDo(print())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(status().isNotFound());
-
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.fiedormichal.postrestapi.service;
 
-import com.fiedormichal.postrestapi.exception.NoContentException;
 import com.fiedormichal.postrestapi.exception.PostNotFoundException;
 import com.fiedormichal.postrestapi.dto.PostDto;
 import com.fiedormichal.postrestapi.exception.PostTitleNotFoundException;
@@ -45,22 +44,18 @@ public class PostService {
     }
 
     private void updateCurrentPostsInDataBase(List<Post> actualPostsFromAPI) {
-        List<Post> postsFromDataBase = postRepository.findAll();
-        for (Post postFromDataBase : postsFromDataBase) {
-            if (!postFromDataBase.isUpdatedByUser()) {
-                Post actualPostToSaveInDataBase = findActualPost(postFromDataBase, actualPostsFromAPI);
-                    postRepository.save(actualPostToSaveInDataBase);
+        for(Post postFromApi : actualPostsFromAPI){
+            if(postRepository.existsById(postFromApi.getId())){
+                Post postFromDataBase = postRepository.findById(postFromApi.getId()).get();
+                if(postFromDataBase.isDeleted() || postFromDataBase.isUpdatedByUser()){
+                    continue;
+                } else {
+                    postRepository.save(postFromApi);
+                }
+            } else {
+                postRepository.save(postFromApi);
             }
         }
-    }
-
-    private Post findActualPost(Post post, List<Post> actualPostsFromAPI) {
-        for (Post actualPostFromAPI : actualPostsFromAPI) {
-            if (actualPostFromAPI.getId() == post.getId()) {
-                return actualPostFromAPI;
-            }
-        }
-        return new Post();
     }
 
     public PostDto editPost(Post post) throws PostNotFoundException {
@@ -90,9 +85,6 @@ public class PostService {
     public List<PostDto> findAllPosts() {
         LOG.info("Searching for posts from database.");
         List<Post> posts = postRepository.findAll();
-        if(posts.size()==0){
-            throw new NoContentException("Posts database is empty.");
-        }
         LOG.info("All posts from database have found successfully");
         return PostDtoMapper.mapToPostDtos(posts);
     }
@@ -101,8 +93,9 @@ public class PostService {
         LOG.info("Searching for a post with id: " + postId + " which will be deleted.");
         Post postToDelete = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post with ID: " + postId + " does not exist."));
+        postToDelete.setDeleted(true);
+        postRepository.save(postToDelete);
         LOG.info("Post with id \""+ postId + "\" has been deleted.");
-        postRepository.delete(postToDelete);
     }
 
     public PostDto getPostByTitle(String title) {
