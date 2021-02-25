@@ -73,7 +73,7 @@ class PostServiceTest {
         //when
         postService.deletePost(1L);
         //then
-        verify(postRepository, times(1)).delete(post);
+        assertTrue(post.isDeleted());
     }
 
     @Test

@@ -50,7 +50,7 @@ class PostControllerTest {
 
         when(postService.getPostByTitle(title)).thenReturn(postDto);
 
-        mockMvc.perform(get("/posts/Test title"))
+        mockMvc.perform(get("/posts/").param("title", title))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
@@ -66,7 +66,7 @@ class PostControllerTest {
 
         when(postService.getPostByTitle(title)).thenThrow(PostTitleNotFoundException.class);
 
-        mockMvc.perform(get("/posts/Test"))
+        mockMvc.perform(get("/posts/").param("title", title))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType("application/json"));
@@ -79,7 +79,7 @@ class PostControllerTest {
 
         when(postRepository.findByTitle(title)).thenReturn(Optional.of(post));
 
-        mockMvc.perform(get("/post/Test title"))
+        mockMvc.perform(get("/post/").param("title", "Test title"))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType("application/json"));
@@ -97,13 +97,13 @@ class PostControllerTest {
                 .title("Test title2")
                 .body("Body for test2")
                 .build();
+
         List<PostDto> postDtos = Arrays.asList(post1, post2);
 
         when(postService.findAllPosts()).thenReturn(postDtos);
 
         mockMvc.perform(get("/posts/"))
                 .andDo(print())
-                .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is(1)))
