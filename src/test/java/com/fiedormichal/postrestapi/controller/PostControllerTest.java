@@ -102,7 +102,8 @@ class PostControllerTest {
 
         when(postService.findAllPosts()).thenReturn(postDtos);
 
-        mockMvc.perform(get("/posts/"))
+        mockMvc.perform(get("/posts")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)))

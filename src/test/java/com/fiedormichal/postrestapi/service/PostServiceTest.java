@@ -1,5 +1,6 @@
 package com.fiedormichal.postrestapi.service;
 
+import ch.qos.logback.core.pattern.parser.OptionTokenizer;
 import com.fiedormichal.postrestapi.dto.PostDto;
 import com.fiedormichal.postrestapi.exception.PostNotFoundException;
 import com.fiedormichal.postrestapi.exception.PostTitleNotFoundException;
@@ -168,7 +169,12 @@ class PostServiceTest {
         postsFromDataBase.add(post2);
         postsFromDataBase.add(postWhichWillNotBeUpdated);
 
-        when(postRepository.findAll()).thenReturn(postsFromDataBase);
+        when(postRepository.existsById(1L)).thenReturn(true);
+        when(postRepository.findById(1L)).thenReturn(Optional.of(post1));
+        when(postRepository.existsById(2L)).thenReturn(true);
+        when(postRepository.findById(2L)).thenReturn(Optional.of(post2));
+        when(postRepository.existsById(3L)).thenReturn(true);
+        when(postRepository.findById(3L)).thenReturn(Optional.of(postWhichWillNotBeUpdated));
 
         final Post post1FromApi = new Post(1,1,"updated title1", "updated body1");
         final Post post2FromApi = new Post(2,2, "updated title2", "updated body2");
@@ -190,5 +196,45 @@ class PostServiceTest {
         verify(postRepository, times(0)).save(post3FromApi);
     }
 
+    @Test
+    void update_posts_in_data_base_should_save_new_posts_from_api_when_database_is_not_empty() throws IOException {
+        //given
+        List<Post> postsFromDataBase = new ArrayList<>();
+        final Post post1 = new Post(1,1,"title1", "body1");
+        final Post post2 = new Post(2,2,"title2", "body2");
+        final Post postWhichWillNotBeUpdated = new Post(3,3,"title3", "body3");
+        postWhichWillNotBeUpdated.setUpdatedByUser(true);
+        postsFromDataBase.add(post1);
+        postsFromDataBase.add(post2);
+        postsFromDataBase.add(postWhichWillNotBeUpdated);
 
+        when(postRepository.existsById(1L)).thenReturn(true);
+        when(postRepository.findById(1L)).thenReturn(Optional.of(post1));
+        when(postRepository.existsById(2L)).thenReturn(true);
+        when(postRepository.findById(2L)).thenReturn(Optional.of(post2));
+        when(postRepository.existsById(3L)).thenReturn(true);
+        when(postRepository.findById(3L)).thenReturn(Optional.of(postWhichWillNotBeUpdated));
+
+        final Post post1FromApi = new Post(1,1,"updated title1", "updated body1");
+        final Post post2FromApi = new Post(2,2, "updated title2", "updated body2");
+        final Post post3FromApi = new Post(3,3, "updated title3", "updated body3");
+        final Post post4FromApi = new Post(4,3, "updated title4", "updated body4");
+
+        List<Post> postsFromApi = new ArrayList<>();
+        postsFromApi.add(post1FromApi);
+        postsFromApi.add(post2FromApi);
+        postsFromApi.add(post3FromApi);
+        postsFromApi.add(post4FromApi);
+        String url = "https://jsonplaceholder.typicode.com/posts";
+
+        when(jsonPostMapper.getMappedPostsList(url)).thenReturn(postsFromApi);
+        when(postRepository.count()).thenReturn(3L);
+        //when
+        postService.updatePostsInDataBase();
+        //then
+        verify(postRepository, times(1)).save(post1FromApi);
+        verify(postRepository, times(1)).save(post2FromApi);
+        verify(postRepository, times(0)).save(post3FromApi);
+        verify(postRepository, times(1)).save(post4FromApi);
+    }
 }
